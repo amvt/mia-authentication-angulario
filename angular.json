@@ -116,6 +116,46 @@
           }
         }
       }
+    },
+    "@mobileia/authentication": {
+      "root": "projects/mobileia/authentication",
+      "sourceRoot": "projects/mobileia/authentication/src",
+      "projectType": "library",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/mobileia/authentication/tsconfig.lib.json",
+            "project": "projects/mobileia/authentication/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "project": "projects/mobileia/authentication/ng-package.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/mobileia/authentication/src/test.ts",
+            "tsConfig": "projects/mobileia/authentication/tsconfig.spec.json",
+            "karmaConfig": "projects/mobileia/authentication/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/mobileia/authentication/tsconfig.lib.json",
+              "projects/mobileia/authentication/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "defaultProject": "mia-authentication-angulario"
