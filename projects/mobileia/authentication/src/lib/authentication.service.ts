@@ -133,10 +133,21 @@ export class AuthenticationService {
     this.getAccessToken().subscribe(token => {
       if(token == null || token.length == 0){
           callback(false);
+          this.isLoggedIn = false;
       }else{
+        this.isLoggedIn = true;
         callback(true);
       }
     });
+  }
+
+  isLoggedObservable() : Observable<boolean>{
+    var observer = new Observable<boolean>(ob => {
+      this.isLogged(isUserLogged => {
+        ob.next(isUserLogged);
+      });
+    });
+    return observer;
   }
 
   /*constructor(protected localStorage: LocalStorage) { 
