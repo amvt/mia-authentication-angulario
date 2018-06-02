@@ -4,13 +4,16 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { AuthenticationModule } from '../../projects/mobileia/authentication/src/lib/authentication.module';
 
+import { HttpClientModule } from '@angular/common/http';
+
 @NgModule({
   declarations: [
     AppComponent
   ],
   imports: [
     BrowserModule,
-    AuthenticationModule.forRoot({apiKey: "2342342AAAAA"})
+    HttpClientModule,
+    AuthenticationModule.forRoot({apiKey: "8"})
   ],
   providers: [],
   bootstrap: [AppComponent]

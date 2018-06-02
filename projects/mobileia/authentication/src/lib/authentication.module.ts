@@ -2,9 +2,11 @@ import { ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core
 import { AuthenticationComponent } from './authentication.component';
 import { localStorageProviders } from '@ngx-pwa/local-storage';
 import { AuthenticationServiceConfig } from '../public_api';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   imports: [
+    HttpClientModule
   ],
   declarations: [AuthenticationComponent],
   exports: [AuthenticationComponent],
