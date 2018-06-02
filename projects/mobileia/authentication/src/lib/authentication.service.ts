@@ -43,6 +43,8 @@ export class AuthenticationService {
         // Guardar AccessToken
         this.localStorage.setItem(this._keyAccessToken, data.response.access_token).subscribe(() => {});;
         this.localStorage.setItem(this._keyUserId, data.response.user_id).subscribe(() => {});;
+        // Guardar que esta logueado
+        this.isLoggedIn = true;
       }
       // Llamar al callback
       callback(data);
@@ -109,6 +111,7 @@ export class AuthenticationService {
     this.localStorage.removeItem(this._keyAccessToken).subscribe(() => {});
     this.localStorage.removeItem(this._keyUserId).subscribe(() => {});
     this.localStorage.clear().subscribe(() => {});
+    this.isLoggedIn = false;
   }
 
   /**
