@@ -1,5 +1,6 @@
 import { TestBed, inject } from '@angular/core/testing';
 import { HttpClientModule } from '@angular/common/http';
+import { RouterModule, Routes } from '@angular/router';
 
 import { AuthenticationService } from './authentication.service';
 import { AuthenticationModule } from '../public_api';

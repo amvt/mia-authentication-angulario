@@ -20,9 +20,14 @@ export class AuthenticationService {
   private _keyUserId = 'key_user_id';
 
   private _apiKey = '';
+  public isLoggedIn = false;
 
   constructor(private http: HttpClient, protected localStorage: LocalStorage, @Optional() config: AuthenticationServiceConfig) {
     if (config) { this._apiKey = config.apiKey; }
+    // Verificar si esta logueado
+    this.isLogged((logged) => {
+      this.isLoggedIn = logged;
+    });
   }
 
   signInWithEmailAndPassword(email: string, password: string, callback : (response : ApiResponse<MIAAccessToken>) => void) {
