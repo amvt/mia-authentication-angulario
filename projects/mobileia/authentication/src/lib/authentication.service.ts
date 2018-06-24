@@ -20,6 +20,7 @@ export class AuthenticationService {
   private _keyUserId = 'key_user_id';
 
   private _apiKey = '';
+  public currentUser : MIAUser;
   public isLoggedIn = false;
 
   constructor(private http: HttpClient, protected localStorage: LocalStorage, @Optional() config: AuthenticationServiceConfig) {
@@ -49,6 +50,17 @@ export class AuthenticationService {
       // Llamar al callback
       callback(data);
     });
+  }
+
+  getCurrentUser(callback : (user) => void){
+    if(this.currentUser != null){
+      callback(this.currentUser);
+    }else{
+      this.getProfile(data => {
+        this.currentUser = data.response;
+        callback(this.currentUser);
+      });
+    }
   }
 
   getProfile(callback : (data: ApiResponse<MIAUser>) => void) {
