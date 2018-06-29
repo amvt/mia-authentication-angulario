@@ -5,7 +5,8 @@ Libreria para incorporar autenticación de usuarios facilmente.
 ## Como usar
 1. Instalar libreria via [npm](http://npmjs.com):
 ```bash
-npm install @mobileia/authentication
+npm install @ngx-pwa/local-storage --save
+npm install @mobileia/authentication --save
 ```
 2. Importar modulo configurando la API_KEY:
 ```js
