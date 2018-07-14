@@ -1,7 +1,7 @@
 import { Injectable, Optional } from '@angular/core';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { MIAUser } from './miauser';
 import { MIAAccessToken } from './miaaccess-token';
 import { ApiResponse } from '@mobileia/core';
@@ -20,14 +20,22 @@ export class AuthenticationService {
   private _keyUserId = 'key_user_id';
 
   private _apiKey = '';
-  public currentUser : MIAUser;
-  public isLoggedIn = false;
+  public currentUser : BehaviorSubject<MIAUser>;
+  public isLoggedIn : BehaviorSubject<boolean>;
 
   constructor(private http: HttpClient, protected localStorage: LocalStorage, @Optional() config: AuthenticationServiceConfig) {
     if (config) { this._apiKey = config.apiKey; }
+    // Creamos observable de la variable que informa que se loguea
+    this.isLoggedIn = new BehaviorSubject<boolean>(false);
+    // Creamos observable para el usuario logueado
+    this.currentUser = new BehaviorSubject<MIAUser>(null);
     // Verificar si esta logueado
     this.isLogged((logged) => {
-      this.isLoggedIn = logged;
+      this.isLoggedIn.next(logged);
+      if(logged){
+        // Buscar datos del perfil
+        this.fetchProfile();
+      }
     });
   }
 
@@ -42,25 +50,38 @@ export class AuthenticationService {
       // Verificar si se logueo correctamente
       if(data.success){
         // Guardar AccessToken
-        this.localStorage.setItem(this._keyAccessToken, data.response.access_token).subscribe(() => {});;
+        this.localStorage.setItem(this._keyAccessToken, data.response.access_token).subscribe(() => {
+          // Buscar datos del perfil
+          this.fetchProfile();
+        });;
         this.localStorage.setItem(this._keyUserId, data.response.user_id).subscribe(() => {});;
         // Guardar que esta logueado
-        this.isLoggedIn = true;
+        this.isLoggedIn.next(true);
       }
       // Llamar al callback
       callback(data);
     });
   }
 
-  getCurrentUser(callback : (user) => void){
+  getCurrentUser() : Observable<MIAUser> {
+    return this.currentUser;
+  }
+
+  getCurrentUserOld(callback : (user) => void){
     if(this.currentUser != null){
       callback(this.currentUser);
     }else{
       this.getProfile(data => {
-        this.currentUser = data.response;
+        this.currentUser.next(data.response);
         callback(this.currentUser);
       });
     }
+  }
+
+  fetchProfile(){
+    this.getProfile(data => {
+      this.currentUser.next(data.response);
+    });
   }
 
   getProfile(callback : (data: ApiResponse<MIAUser>) => void) {
@@ -123,7 +144,8 @@ export class AuthenticationService {
     this.localStorage.removeItem(this._keyAccessToken).subscribe(() => {});
     this.localStorage.removeItem(this._keyUserId).subscribe(() => {});
     this.localStorage.clear().subscribe(() => {});
-    this.isLoggedIn = false;
+    this.isLoggedIn.next(false);
+    this.currentUser.next(null);
   }
 
   /**
@@ -145,12 +167,14 @@ export class AuthenticationService {
     this.getAccessToken().subscribe(token => {
       if(token == null || token.length == 0){
           callback(false);
-          this.isLoggedIn = false;
       }else{
-        this.isLoggedIn = true;
         callback(true);
       }
     });
+  }
+
+  isLoggedBehavior() : BehaviorSubject<boolean>{
+    return this.isLoggedIn;
   }
 
   isLoggedObservable() : Observable<boolean>{
