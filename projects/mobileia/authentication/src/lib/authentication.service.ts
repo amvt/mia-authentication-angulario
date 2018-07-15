@@ -15,7 +15,7 @@ export class AuthenticationServiceConfig {
 })
 export class AuthenticationService {
 
-  private _baseUrl = 'http://authentication.mobileia.com/api/';
+  private _baseUrl = 'https://authentication.mobileia.com/api/';
   private _keyAccessToken = 'key_access_token';
   private _keyUserId = 'key_user_id';
 
