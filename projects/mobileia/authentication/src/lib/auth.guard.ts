@@ -17,7 +17,7 @@ export class AuthGuard implements CanActivate {
       reply.subscribe(isLogged => {
         if(!isLogged){
           // Navigate to the login page with extras
-          this.router.navigate(['/login']);
+          this.router.navigate(['/login', {redirect: window.location.pathname}]);
         }
       });
       return reply;
