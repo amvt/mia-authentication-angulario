@@ -148,6 +148,14 @@ export class AuthenticationService {
     this.currentUser.next(null);
   }
 
+  saveAccesstoken(accessToken){
+    // Guardar AccessToken
+    this.localStorage.setItem(this._keyAccessToken, accessToken).subscribe(() => {
+      // Buscar datos del perfil
+      this.fetchProfile();
+    });;
+  }
+
   /**
    * Devuelve API Key
    */
