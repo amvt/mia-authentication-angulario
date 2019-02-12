@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { AuthenticationService } from '../../projects/mobileia/authentication/src/lib/authentication.service';
+import { TestServiceService } from './test-service.service';
 
 @Component({
   selector: 'app-root',

@@ -1,6 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { ApiResponse, MiaHttpService } from "@mobileia/core";
 import { AuthenticationService } from "./authentication.service";
+import { forkJoin, Observable, merge, bindCallback } from "rxjs";
 
 export class MiaAuthHttpService extends MiaHttpService {
 

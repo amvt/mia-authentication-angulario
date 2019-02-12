@@ -137,7 +137,9 @@ export class AuthenticationService {
       photo: params.photo,
       phone: params.phone
     };
-    return this.http.post<ApiResponse<MIAUser>>(this._baseUrl + 'update', postParams);
+    return this.http.post<ApiResponse<MIAUser>>(this._baseUrl + 'update', postParams).subscribe(data => {
+      callback(data);
+    });
   }
 
   signOut() {
