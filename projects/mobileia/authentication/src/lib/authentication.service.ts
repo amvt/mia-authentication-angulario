@@ -104,7 +104,12 @@ export class AuthenticationService {
     });
   }
 
-  registerUser(params) : Observable<ApiResponse<any>> {
+  registerUser(params): Observable<ApiResponse<any>> {
+    // Verificar si tiene foto asignada
+    var photo = '';
+    if (params.photo) {
+      photo = params.photo;
+    }
     var postParams = {
       app_id: this._apiKey,
       register_type: "normal",
@@ -112,6 +117,7 @@ export class AuthenticationService {
       password: params.password,
       firstname: params.firstname,
       lastname: params.lastname,
+      photo: photo,
       platform: 2
     };
     return this.http.post<ApiResponse<MIAUser>>(this._baseUrl + 'register', postParams);
