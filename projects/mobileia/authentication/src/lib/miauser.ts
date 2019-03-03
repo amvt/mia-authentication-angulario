@@ -1,5 +1,6 @@
 export class MIAUser {
     public id : number;
+    public mia_id: number;
     public email : string;
     public firstname : string;
     public lastname : string;
