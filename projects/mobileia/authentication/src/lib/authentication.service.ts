@@ -2,6 +2,7 @@ import { Injectable, Optional } from '@angular/core';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { MIAUser } from './miauser';
 import { MIAAccessToken } from './miaaccess-token';
 import { ApiResponse } from '@mobileia/core';
@@ -99,7 +100,16 @@ export class AuthenticationService {
       access_token: access_token,
       app_id: this._apiKey
     };
-    return this.http.post<ApiResponse<MIAUser>>(this._baseUrl + 'me', params).subscribe(data => {
+    return this.http.post<ApiResponse<MIAUser>>(this._baseUrl + 'me', params)
+    .pipe(map(data => {
+      // Verificar si el AccessToken es incorrecto cerrar sesión
+      if (!data.success && data.error && data.error.code == 413) {
+        this.signOut();
+        window.location.reload();
+      }
+      return data;
+    }))
+    .subscribe(data => {
       callback(data);
     });
   }
