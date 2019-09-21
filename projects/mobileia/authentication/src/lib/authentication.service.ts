@@ -163,11 +163,11 @@ export class AuthenticationService {
   }
 
   getAccessToken(): Observable<string> {
-    return this.storage.get<any>(this._keyAccessToken);
+    return this.storage.get<string>(this._keyAccessToken);
   }
 
   getUserID(): Observable<number> {
-    return this.storage.get<any>(this._keyUserId);
+    return this.storage.get<number>(this._keyUserId);
   }
 
 }
