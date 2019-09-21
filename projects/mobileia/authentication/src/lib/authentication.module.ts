@@ -1,17 +1,17 @@
 import { ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core';
 import { AuthenticationComponent } from './authentication.component';
-import { localStorageProviders } from '@ngx-pwa/local-storage';
 import { HttpClientModule } from '@angular/common/http';
 import { AuthenticationServiceConfig } from './authentication.service';
+import { StorageModule } from '@ngx-pwa/local-storage';
 
 @NgModule({
   imports: [
-    HttpClientModule
+    HttpClientModule,
+    StorageModule.forRoot({ IDBNoWrap: true })
   ],
   declarations: [AuthenticationComponent],
   exports: [AuthenticationComponent],
   providers: [
-    localStorageProviders({ prefix: 'mia-authentication' })
   ]
 })
 export class AuthenticationModule {

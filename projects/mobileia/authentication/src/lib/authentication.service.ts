@@ -6,6 +6,7 @@ import { map, switchMap } from 'rxjs/operators';
 import { MIAUser } from './miauser';
 import { MIAAccessToken } from './miaaccess-token';
 import { ApiResponse } from '@mobileia/core';
+import { createOfflineCompileUrlResolver } from '@angular/compiler';
 
 export class AuthenticationServiceConfig {
   apiKey = '';
@@ -35,6 +36,7 @@ export class AuthenticationService {
     this.currentUser = new BehaviorSubject<MIAUser>(null);
     // Verificar si esta logueado
     this.getAccessToken().subscribe(accessToken => {
+      console.log(accessToken);
       if (accessToken == null) {
         return;
       }
@@ -163,11 +165,11 @@ export class AuthenticationService {
   }
 
   getAccessToken(): Observable<string> {
-    return this.storage.get<string>(this._keyAccessToken);
+    return this.storage.get(this._keyAccessToken, { type: 'string'});
   }
 
   getUserID(): Observable<number> {
-    return this.storage.get<number>(this._keyUserId);
+    return this.storage.get(this._keyUserId, { type: 'number' });
   }
 
 }

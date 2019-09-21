@@ -22,10 +22,17 @@ export class AppComponent {
       console.log(data);
     });
 
-    /*this.service.signInWithEmailAndPassword('matiascamiletti@mobileia.com', '123Qwerty').subscribe(data => {
+    /*this.service.signInWithEmailAndPassword('matiascamiletti@mobileia.com', '123456').subscribe(data => {
       console.log('User:');
       console.log(data);
     });*/
       //alert("LA Key es: " + service.getApiKey());
+  }
+
+  onLogin() {
+    this.service.signInWithEmailAndPassword('matiascamiletti@mobileia.com', '123456').subscribe(data => {
+      console.log('User:');
+      console.log(data);
+    });
   }
 }
