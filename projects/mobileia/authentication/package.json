@@ -1,12 +1,12 @@
 {
     "name": "@mobileia/authentication",
-    "version": "0.0.39",
+    "version": "8.0.1",
     "peerDependencies": {
-        "@angular/common": "^6.0.0-rc.0 || ^6.0.0",
-        "@angular/core": "^6.0.0-rc.0 || ^6.0.0",
-        "@angular/router": "^6.0.3",
-        "@ngx-pwa/local-storage": "^6.0.0-rc.0",
-        "@mobileia/core": "^0.0.13"
+        "@angular/common": "^8.2.7",
+        "@angular/core": "^8.2.7",
+        "@angular/router": "^8.2.7",
+        "@ngx-pwa/local-storage": "^8.2.2",
+        "@mobileia/core": "^8.0.1"
     },
     "repository": {
         "type": "git",
