@@ -1,8 +1,8 @@
 import { Injectable, Optional } from '@angular/core';
-import { LocalStorage } from '@ngx-pwa/local-storage';
+import { StorageMap } from '@ngx-pwa/local-storage';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import { MIAUser } from './miauser';
 import { MIAAccessToken } from './miaaccess-token';
 import { ApiResponse } from '@mobileia/core';
@@ -21,83 +21,71 @@ export class AuthenticationService {
   private _keyUserId = 'key_user_id';
 
   private _apiKey = '';
-  public currentUser : BehaviorSubject<MIAUser>;
-  public isLoggedIn : BehaviorSubject<boolean>;
+  public currentUser: BehaviorSubject<MIAUser>;
+  public isLoggedIn: BehaviorSubject<boolean>;
 
-  constructor(private http: HttpClient, protected localStorage: LocalStorage, @Optional() config: AuthenticationServiceConfig) {
+  constructor(
+    private http: HttpClient,
+    private storage: StorageMap,
+    @Optional() config: AuthenticationServiceConfig) {
     if (config) { this._apiKey = config.apiKey; }
     // Creamos observable de la variable que informa que se loguea
     this.isLoggedIn = new BehaviorSubject<boolean>(false);
     // Creamos observable para el usuario logueado
     this.currentUser = new BehaviorSubject<MIAUser>(null);
     // Verificar si esta logueado
-    this.isLogged((logged) => {
-      this.isLoggedIn.next(logged);
-      if(logged){
-        // Buscar datos del perfil
-        this.fetchProfile();
+    this.getAccessToken().subscribe(accessToken => {
+      if (accessToken == null) {
+        return;
       }
+      // Cargar profile
+      this.loadProfile();
     });
   }
 
-  signInWithEmailAndPassword(email: string, password: string, callback : (response : ApiResponse<MIAAccessToken>) => void) {
-    var params = {
-      grant_type: "normal",
+  signInWithEmailAndPassword(email: string, password: string): Observable<ApiResponse<MIAAccessToken>> {
+    const params = {
+      grant_type: 'normal',
       app_id: this._apiKey,
       email: email,
       password: password
     };
-    this.http.post<ApiResponse<MIAAccessToken>>(this._baseUrl + 'oauth', params).subscribe(data => {
+    return this.http.post<ApiResponse<MIAAccessToken>>(this._baseUrl + 'oauth', params)
+    .pipe(map(data => {
+
       // Verificar si se logueo correctamente
-      if(data.success){
+      if (data.success) {
         // Guardar AccessToken
-        this.localStorage.setItem(this._keyAccessToken, data.response.access_token).subscribe(() => {
+        this.storage.set(this._keyAccessToken, data.response.access_token).subscribe(() => {
           // Buscar datos del perfil
-          this.fetchProfile();
-        });;
-        this.localStorage.setItem(this._keyUserId, data.response.user_id).subscribe(() => {});;
+          this.loadProfile();
+        });
+        this.storage.set(this._keyUserId, data.response.user_id).subscribe(() => {});
         // Guardar que esta logueado
         this.isLoggedIn.next(true);
       }
-      // Llamar al callback
-      callback(data);
-    });
+
+      return data;
+    }));
   }
 
-  getCurrentUser() : Observable<MIAUser> {
-    return this.currentUser;
+  protected loadProfile() {
+    this.fetchProfile().subscribe(data => {});
   }
 
-  getCurrentUserOld(callback : (user) => void){
-    if(this.currentUser != null){
-      callback(this.currentUser);
-    }else{
-      this.getProfile(data => {
-        this.currentUser.next(data.response);
-        callback(this.currentUser);
-      });
-    }
-  }
-
-  fetchProfile(){
-    this.getProfile(data => {
-      this.currentUser.next(data.response);
-    });
-  }
-
-  getProfile(callback : (data: ApiResponse<MIAUser>) => void) {
-    this.getAccessToken().subscribe(token => {
-      if(token == null){
+  fetchProfile(): Observable<ApiResponse<MIAUser>> {
+    // Obtenemos AccessToken
+    return this.getAccessToken().pipe(switchMap(accessToken => {
+      if (accessToken == null) {
         return;
       }
-      this.requestProfile(token, callback);
-    });
-    
+      return this.requestProfile(accessToken);
+    }));
   }
 
-  private requestProfile(access_token : string, callback : (data: ApiResponse<MIAUser>) => void) {
-    var params = {
-      access_token: access_token,
+  protected requestProfile(accessToken: string): Observable<ApiResponse<MIAUser>> {
+    const params = {
+      access_token: accessToken,
       app_id: this._apiKey
     };
     return this.http.post<ApiResponse<MIAUser>>(this._baseUrl + 'me', params)
@@ -107,22 +95,27 @@ export class AuthenticationService {
         this.signOut();
         window.location.reload();
       }
+      // Verificar si fue correcto
+      if (data.success) {
+        // Guardar datos de perfil
+        this.currentUser.next(data.response);
+        // Esta logueado
+        this.isLoggedIn.next(true);
+      }
+      // Devolvemos Observable
       return data;
-    }))
-    .subscribe(data => {
-      callback(data);
-    });
+    }));
   }
 
   registerUser(params): Observable<ApiResponse<any>> {
     // Verificar si tiene foto asignada
-    var photo = '';
+    let photo = '';
     if (params.photo) {
       photo = params.photo;
     }
-    var postParams = {
+    const postParams = {
       app_id: this._apiKey,
-      register_type: "normal",
+      register_type: 'normal',
       email: params.email,
       password: params.password,
       firstname: params.firstname,
@@ -133,86 +126,48 @@ export class AuthenticationService {
     return this.http.post<ApiResponse<MIAUser>>(this._baseUrl + 'register', postParams);
   }
 
-  updateUser(params, callback : (data: ApiResponse<MIAUser>) => void) {
-    this.getAccessToken().subscribe(token => {
-      if(token == null){
+  updateUser(params: any): Observable<ApiResponse<MIAUser>> {
+    // Obtenemos AccessToken
+    return this.getAccessToken().pipe(switchMap(accessToken => {
+      if (accessToken == null) {
         return;
       }
-      this.requestUpdateUser(params, token, callback);
-    });
-    
-  }
-
-  private requestUpdateUser(params, access_token : string, callback : (data: ApiResponse<MIAUser>) => void){
-    var postParams = {
-      app_id: this._apiKey,
-      access_token: access_token,
-      email: params.email,
-      firstname: params.firstname,
-      lastname: params.lastname,
-      photo: params.photo,
-      phone: params.phone
-    };
-    return this.http.post<ApiResponse<MIAUser>>(this._baseUrl + 'update', postParams).subscribe(data => {
-      callback(data);
-    });
+      // Asignar APP ID
+      params.app_id = this._apiKey;
+      params.access_token = accessToken;
+      return this.http.post<ApiResponse<MIAUser>>(this._baseUrl + 'update', params);
+    }));
   }
 
   signOut() {
-    this.localStorage.removeItem(this._keyAccessToken).subscribe(() => {});
-    this.localStorage.removeItem(this._keyUserId).subscribe(() => {});
-    this.localStorage.clear().subscribe(() => {});
+    this.storage.delete(this._keyAccessToken).subscribe(() => {});
+    this.storage.delete(this._keyUserId).subscribe(() => {});
+    this.storage.clear().subscribe(() => {});
     this.isLoggedIn.next(false);
     this.currentUser.next(null);
   }
 
-  saveAccesstoken(accessToken){
+  saveAccesstoken(accessToken) {
     // Guardar AccessToken
-    this.localStorage.setItem(this._keyAccessToken, accessToken).subscribe(() => {
+    this.storage.set(this._keyAccessToken, accessToken).subscribe(() => {
       // Buscar datos del perfil
-      this.fetchProfile();
-    });;
+      this.loadProfile();
+    });
   }
 
   /**
    * Devuelve API Key
    */
-  getApiKey() : string {
+  getApiKey(): string {
     return this._apiKey;
   }
 
-  getAccessToken() {
-    return this.localStorage.getItem<string>(this._keyAccessToken);
+  getAccessToken(): Observable<string> {
+    return this.storage.get<any>(this._keyAccessToken);
   }
 
-  getUserID(){
-    return this.localStorage.getItem<number>(this._keyUserId);
+  getUserID(): Observable<number> {
+    return this.storage.get<any>(this._keyUserId);
   }
 
-  isLogged(callback : (isUserLogged) => void){
-    this.getAccessToken().subscribe(token => {
-      if(token == null || token.length == 0){
-          callback(false);
-      }else{
-        callback(true);
-      }
-    });
-  }
-
-  isLoggedBehavior() : BehaviorSubject<boolean>{
-    return this.isLoggedIn;
-  }
-
-  isLoggedObservable() : Observable<boolean>{
-    var observer = new Observable<boolean>(ob => {
-      this.isLogged(isUserLogged => {
-        ob.next(isUserLogged);
-      });
-    });
-    return observer;
-  }
-
-  /*constructor(protected localStorage: LocalStorage) { 
-    this.localStorage.setItem('test', 'test');
-  }*/
 }

@@ -10,7 +10,22 @@ import { TestServiceService } from './test-service.service';
 export class AppComponent {
   title = 'app';
 
-  constructor(service: AuthenticationService){
+  constructor(private service: AuthenticationService) {
+
+    this.service.isLoggedIn.subscribe(data => {
+      console.log('Logged:');
+      console.log(data);
+    });
+
+    this.service.currentUser.subscribe(data => {
+      console.log('User:');
+      console.log(data);
+    });
+
+    /*this.service.signInWithEmailAndPassword('matiascamiletti@mobileia.com', '123Qwerty').subscribe(data => {
+      console.log('User:');
+      console.log(data);
+    });*/
       //alert("LA Key es: " + service.getApiKey());
   }
 }
