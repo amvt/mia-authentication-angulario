@@ -141,6 +141,16 @@ export class AuthenticationService {
     }));
   }
 
+  recoveryPass(email: string, newPassword: string): Observable<ApiResponse<boolean>> {
+    const params = {
+      app_id: this._apiKey,
+      email: email,
+      password: newPassword,
+      platform: 2
+    };
+    return this.http.post<ApiResponse<boolean>>(this._baseUrl + 'recovery', params);
+  }
+
   signOut() {
     this.storage.delete(this._keyAccessToken).subscribe(() => {});
     this.storage.delete(this._keyUserId).subscribe(() => {});
