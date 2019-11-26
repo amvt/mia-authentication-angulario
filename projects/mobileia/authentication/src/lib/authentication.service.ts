@@ -45,6 +45,32 @@ export class AuthenticationService {
     });
   }
 
+  signInWithFacebook(facebookId: string, facebookToken: string): Observable<ApiResponse<MIAAccessToken>> {
+    const params = {
+      grant_type: 'facebook',
+      app_id: this._apiKey,
+      facebook_id: facebookId,
+      facebook_access_token: facebookToken
+    };
+    return this.http.post<ApiResponse<MIAAccessToken>>(this._baseUrl + 'oauth', params)
+    .pipe(map(data => {
+
+      // Verificar si se logueo correctamente
+      if (data.success) {
+        // Guardar AccessToken
+        this.storage.set(this._keyAccessToken, data.response.access_token).subscribe(() => {
+          // Buscar datos del perfil
+          this.loadProfile();
+        });
+        this.storage.set(this._keyUserId, data.response.user_id).subscribe(() => {});
+        // Guardar que esta logueado
+        this.isLoggedIn.next(true);
+      }
+
+      return data;
+    }));
+  }
+
   signInWithEmailAndPassword(email: string, password: string): Observable<ApiResponse<MIAAccessToken>> {
     const params = {
       grant_type: 'normal',
@@ -107,6 +133,22 @@ export class AuthenticationService {
       // Devolvemos Observable
       return data;
     }));
+  }
+
+  registerUserWithFacebook(params): Observable<ApiResponse<any>> {
+    // Verificar si tiene foto asignada
+    let photo = '';
+    if (params.photo) {
+      photo = params.photo;
+    }
+    const postParams = {
+      app_id: this._apiKey,
+      register_type: 'facebook',
+      facebook_id: params.facebookId,
+      facebook_access_token: params.facebookToken,
+      platform: 2
+    };
+    return this.http.post<ApiResponse<MIAUser>>(this._baseUrl + 'register', postParams);
   }
 
   registerUser(params): Observable<ApiResponse<any>> {
