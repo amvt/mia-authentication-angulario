@@ -6,7 +6,6 @@ import { map, switchMap } from 'rxjs/operators';
 import { MIAUser } from './miauser';
 import { MIAAccessToken } from './miaaccess-token';
 import { ApiResponse } from '@mobileia/core';
-import { createOfflineCompileUrlResolver } from '@angular/compiler';
 
 export class AuthenticationServiceConfig {
   apiKey = '';
@@ -157,6 +156,10 @@ export class AuthenticationService {
     if (params.photo) {
       photo = params.photo;
     }
+    let phone = '';
+    if (params.phone) {
+      phone = params.phone;
+    }
     const postParams = {
       app_id: this._apiKey,
       register_type: 'normal',
@@ -165,6 +168,7 @@ export class AuthenticationService {
       firstname: params.firstname,
       lastname: params.lastname,
       photo: photo,
+      phone: phone,
       platform: 2
     };
     return this.http.post<ApiResponse<MIAUser>>(this._baseUrl + 'register', postParams);
