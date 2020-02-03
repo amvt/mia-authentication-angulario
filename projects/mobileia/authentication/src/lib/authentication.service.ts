@@ -44,6 +44,32 @@ export class AuthenticationService {
     });
   }
 
+  signInWithGoogle(authToken: string, googleToken: string): Observable<ApiResponse<MIAAccessToken>> {
+    const params = {
+      grant_type: 'google',
+      app_id: this._apiKey,
+      auth_token: authToken,
+      google_token: googleToken
+    };
+    return this.http.post<ApiResponse<MIAAccessToken>>(this._baseUrl + 'oauth', params)
+    .pipe(map(data => {
+
+      // Verificar si se logueo correctamente
+      if (data.success) {
+        // Guardar AccessToken
+        this.storage.set(this._keyAccessToken, data.response.access_token).subscribe(() => {
+          // Buscar datos del perfil
+          this.loadProfile();
+        });
+        this.storage.set(this._keyUserId, data.response.user_id).subscribe(() => {});
+        // Guardar que esta logueado
+        this.isLoggedIn.next(true);
+      }
+
+      return data;
+    }));
+  }
+
   signInWithFacebook(facebookId: string, facebookToken: string): Observable<ApiResponse<MIAAccessToken>> {
     const params = {
       grant_type: 'facebook',
