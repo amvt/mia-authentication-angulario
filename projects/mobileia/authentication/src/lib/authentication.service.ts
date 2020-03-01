@@ -19,6 +19,7 @@ export class AuthenticationService {
   private _baseUrl = 'https://authentication.mobileia.com/api/';
   private _keyAccessToken = 'key_access_token';
   private _keyUserId = 'key_user_id';
+  private _keyUserData = 'key_user_data';
 
   private _apiKey = '';
   public currentUser: BehaviorSubject<MIAUser>;
@@ -150,6 +151,8 @@ export class AuthenticationService {
       }
       // Verificar si fue correcto
       if (data.success) {
+        // Guardar datos del usuario en la DB local
+        this.storage.set(this._keyUserData, data.response).subscribe(() => {});
         // Guardar datos de perfil
         this.currentUser.next(data.response);
         // Esta logueado
@@ -226,6 +229,7 @@ export class AuthenticationService {
   signOut() {
     this.storage.delete(this._keyAccessToken).subscribe(() => {});
     this.storage.delete(this._keyUserId).subscribe(() => {});
+    this.storage.delete(this._keyUserData).subscribe(() => {});
     this.storage.clear().subscribe(() => {});
     this.isLoggedIn.next(false);
     this.currentUser.next(null);
@@ -252,6 +256,10 @@ export class AuthenticationService {
 
   getUserID(): Observable<number> {
     return this.storage.get(this._keyUserId, { type: 'number' });
+  }
+
+  getUserData(): Observable<MIAUser> {
+    return this.storage.get(this._keyUserData, { type: 'object' });
   }
 
 }
