@@ -34,7 +34,7 @@ const appRoutes: Routes = [
   imports: [
     BrowserModule,
     HttpClientModule,
-    AuthenticationModule.forRoot({apiKey: '16' }),
+    AuthenticationModule.forRoot({apiKey: '16', isInternal: false, baseUrlInternal: '' }),
     StorageModule.forRoot({ IDBNoWrap: true }),
     RouterModule.forRoot(appRoutes)
   ],

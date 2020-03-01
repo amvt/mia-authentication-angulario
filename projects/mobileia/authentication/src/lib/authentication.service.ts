@@ -9,6 +9,8 @@ import { ApiResponse } from '@mobileia/core';
 
 export class AuthenticationServiceConfig {
   apiKey = '';
+  isInternal = false;
+  baseUrlInternal = '';
 }
 
 @Injectable({
@@ -17,6 +19,8 @@ export class AuthenticationServiceConfig {
 export class AuthenticationService {
 
   private _baseUrl = 'https://authentication.mobileia.com/api/';
+  private _baseUrlInternal = '';
+  private _isInternal = false;
   private _keyAccessToken = 'key_access_token';
   private _keyUserId = 'key_user_id';
   private _keyUserData = 'key_user_data';
@@ -29,15 +33,22 @@ export class AuthenticationService {
     private http: HttpClient,
     private storage: StorageMap,
     @Optional() config: AuthenticationServiceConfig) {
-    if (config) { this._apiKey = config.apiKey; }
+    if (config) { 
+      this._apiKey = config.apiKey;
+    }
+    if (config && config.baseUrlInternal) {
+      this._baseUrlInternal = config.baseUrlInternal;
+    }
+    if (config && config.isInternal) {
+      this._isInternal = config.isInternal;
+    }
     // Creamos observable de la variable que informa que se loguea
     this.isLoggedIn = new BehaviorSubject<boolean>(false);
     // Creamos observable para el usuario logueado
     this.currentUser = new BehaviorSubject<MIAUser>(null);
     // Verificar si esta logueado
     this.getAccessToken().subscribe(accessToken => {
-      console.log(accessToken);
-      if (accessToken == null) {
+      if (accessToken == null || !this._isInternal) {
         return;
       }
       // Cargar profile
@@ -89,6 +100,28 @@ export class AuthenticationService {
           this.loadProfile();
         });
         this.storage.set(this._keyUserId, data.response.user_id).subscribe(() => {});
+        // Guardar que esta logueado
+        this.isLoggedIn.next(true);
+      }
+
+      return data;
+    }));
+  }
+
+  signInWithEmailAndPasswordInternal(email: string, password: string): Observable<ApiResponse<{ access_token: MIAAccessToken, user: MIAUser }>> {
+    const params = {
+      email: email,
+      password: password
+    };
+    return this.http.post<ApiResponse<{ access_token: MIAAccessToken, user: MIAUser }>>(this._baseUrlInternal + 'mia-auth/login', params)
+    .pipe(map(data => {
+
+      // Verificar si se logueo correctamente
+      if (data.success) {
+        // Guardar AccessToken
+        this.storage.set(this._keyAccessToken, data.response.access_token.access_token).subscribe(() => {});
+        this.storage.set(this._keyUserId, data.response.access_token.user_id).subscribe(() => {});
+        this.storage.set(this._keyUserData, JSON.stringify(data.response.user)).subscribe(() => {});
         // Guardar que esta logueado
         this.isLoggedIn.next(true);
       }
@@ -152,7 +185,7 @@ export class AuthenticationService {
       // Verificar si fue correcto
       if (data.success) {
         // Guardar datos del usuario en la DB local
-        this.storage.set(this._keyUserData, data.response).subscribe(() => {});
+        this.storage.set(this._keyUserData, JSON.stringify(data.response)).subscribe(() => {});
         // Guardar datos de perfil
         this.currentUser.next(data.response);
         // Esta logueado
@@ -259,7 +292,7 @@ export class AuthenticationService {
   }
 
   getUserData(): Observable<MIAUser> {
-    return this.storage.get(this._keyUserData, { type: 'object' });
+    return this.storage.get(this._keyUserData, { type: 'string' }).pipe(map(data => JSON.parse(data)));
   }
 
 }
