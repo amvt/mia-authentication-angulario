@@ -48,11 +48,22 @@ export class AuthenticationService {
     this.currentUser = new BehaviorSubject<MIAUser>(null);
     // Verificar si esta logueado
     this.getAccessToken().subscribe(accessToken => {
-      if (accessToken == null || !this._isInternal) {
+      if (accessToken == null) {
         return;
       }
-      // Cargar profile
-      this.loadProfile();
+      if (this._isInternal) {
+        // Esta logueado
+        this.isLoggedIn.next(true);
+        // Buscar datos del usuario
+        this.getUserData().subscribe(data => {
+          // Guardar datos de perfil
+          this.currentUser.next(data);
+        });
+      } else {
+        // Cargar profile
+        this.loadProfile();
+      }
+      
     });
   }
 
