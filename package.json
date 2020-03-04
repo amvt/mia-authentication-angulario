@@ -23,7 +23,7 @@
     "@mobileia/core": "8.0.1",
     "@ngx-pwa/local-storage": "^9.0.2",
     "core-js": "^3.2.1",
-    "rxjs": "^6.5.3",
+    "rxjs": "^6.5.4",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2"
   },
@@ -48,6 +48,6 @@
     "protractor": "~5.4.2",
     "ts-node": "~8.4.1",
     "tslint": "~5.20.0",
-    "typescript": "^3.8.3"
+    "typescript": "^3.4.5"
   }
 }
