@@ -138,9 +138,9 @@
           },
           "configurations": {
             "production": {
-              "project": "projects/mobileia/authentication/ng-package.prod.json"
-            ,              "tsConfig": "projects/mobileia/authentication/tsconfig.lib.prod.json"
-}
+              "project": "projects/mobileia/authentication/ng-package.prod.json",
+              "tsConfig": "projects/mobileia/authentication/tsconfig.lib.prod.json"
+            }
           }
         },
         "test": {
@@ -166,5 +166,8 @@
       }
     }
   },
-  "defaultProject": "mia-authentication-angulario"
+  "defaultProject": "mia-authentication-angulario",
+  "cli": {
+    "analytics": "f1ac333d-dd91-4efd-860b-12639167247e"
+  }
 }
