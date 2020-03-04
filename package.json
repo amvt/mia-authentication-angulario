@@ -21,7 +21,7 @@
     "@angular/platform-browser-dynamic": "^9.0.5",
     "@angular/router": "^9.0.5",
     "@mobileia/core": "8.0.1",
-    "@ngx-pwa/local-storage": "^8.2.2",
+    "@ngx-pwa/local-storage": "^9.0.2",
     "core-js": "^3.2.1",
     "rxjs": "^6.5.3",
     "tslib": "^1.10.0",
