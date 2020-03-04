@@ -20,7 +20,7 @@
     "@angular/platform-browser": "^9.0.5",
     "@angular/platform-browser-dynamic": "^9.0.5",
     "@angular/router": "^9.0.5",
-    "@mobileia/core": "8.0.1",
+    "@mobileia/core": "9.0.0",
     "@ngx-pwa/local-storage": "^9.0.2",
     "core-js": "^3.2.1",
     "rxjs": "^6.5.4",
@@ -48,6 +48,6 @@
     "protractor": "~5.4.2",
     "ts-node": "~8.4.1",
     "tslint": "~5.20.0",
-    "typescript": "^3.4.5"
+    "typescript": "^3.6.5"
   }
 }

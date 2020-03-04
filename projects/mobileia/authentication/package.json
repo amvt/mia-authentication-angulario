@@ -6,7 +6,7 @@
         "@angular/core": "^9.0.5",
         "@angular/router": "^9.0.5",
         "@ngx-pwa/local-storage": "^9.0.2",
-        "@mobileia/core": "^8.0.1"
+        "@mobileia/core": "^9.0.0"
     },
     "repository": {
         "type": "git",
