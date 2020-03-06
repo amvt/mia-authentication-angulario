@@ -141,6 +141,13 @@ export class AuthenticationService {
     }));
   }
 
+  registerInternal(user: MIAUser, password: string): Observable<ApiResponse<MIAUser>> {
+    let params: any = user;
+    params.password = password;
+    params.platform = 2;
+    return this.http.post<ApiResponse<MIAUser>>(this._baseUrlInternal + 'mia-auth/register', params);
+  }
+
   signInWithEmailAndPassword(email: string, password: string): Observable<ApiResponse<MIAAccessToken>> {
     const params = {
       grant_type: 'normal',
