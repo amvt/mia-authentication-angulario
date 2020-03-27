@@ -281,6 +281,8 @@ export class AuthenticationService {
     this.storage.set(this._keyAccessToken, accessToken).subscribe(() => {});
     this.storage.set(this._keyUserId, userId).subscribe(() => {});
     this.storage.set(this._keyUserData, JSON.stringify(user)).subscribe(() => {});
+    // Sincronizar dato del usuario
+    this.currentUser.next(user);
   }
 
   signOut() {
