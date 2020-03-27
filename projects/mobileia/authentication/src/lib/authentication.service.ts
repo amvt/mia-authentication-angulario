@@ -277,6 +277,12 @@ export class AuthenticationService {
     return this.http.post<ApiResponse<boolean>>(this._baseUrl + 'recovery', params);
   }
 
+  saveDataLoginInternal(accessToken: string, userId: number, user: MIAUser) {
+    this.storage.set(this._keyAccessToken, accessToken).subscribe(() => {});
+    this.storage.set(this._keyUserId, userId).subscribe(() => {});
+    this.storage.set(this._keyUserData, JSON.stringify(user)).subscribe(() => {});
+  }
+
   signOut() {
     this.storage.delete(this._keyAccessToken).subscribe(() => {});
     this.storage.delete(this._keyUserId).subscribe(() => {});
