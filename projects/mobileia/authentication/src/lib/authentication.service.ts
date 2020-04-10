@@ -8,9 +8,10 @@ import { MIAAccessToken } from './miaaccess-token';
 import { ApiResponse } from '@mobileia/core';
 
 export class AuthenticationServiceConfig {
-  apiKey = '';
-  isInternal = false;
-  baseUrlInternal = '';
+  apiKey? = '';
+  isInternal? = false;
+  baseUrlInternal? = '';
+  pathLogin? = '';
 }
 
 @Injectable({
@@ -28,6 +29,7 @@ export class AuthenticationService {
   private _apiKey = '';
   public currentUser: BehaviorSubject<MIAUser>;
   public isLoggedIn: BehaviorSubject<boolean>;
+  public pathLogin = 'login';
 
   constructor(
     private http: HttpClient,
@@ -41,6 +43,11 @@ export class AuthenticationService {
     }
     if (config && config.isInternal) {
       this._isInternal = config.isInternal;
+    }
+    if(config && config.pathLogin){
+      this.pathLogin = config.pathLogin;
+    } else {
+      this.pathLogin = 'login';
     }
     // Creamos observable de la variable que informa que se loguea
     this.isLoggedIn = new BehaviorSubject<boolean>(false);
