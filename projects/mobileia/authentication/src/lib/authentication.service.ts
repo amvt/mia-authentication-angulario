@@ -274,11 +274,11 @@ export class AuthenticationService {
     }));
   }
 
-  recoveryPassInternal(token: string, email: string, password: string): Observable<ApiResponse<MIAUser>> {
+  changePasswordRecovery(token: string, email: string, password: string): Observable<ApiResponse<MIAUser>> {
     return this.http.post<ApiResponse<MIAUser>>(this._baseUrlInternal + 'mia-auth/change-password-recovery', { email: email, token: token, password: password});
   }
 
-  changePasswordRecovery(email: string): Observable<ApiResponse<MIAUser>> {
+  recoveryPassInternal(email: string): Observable<ApiResponse<MIAUser>> {
     return this.http.post<ApiResponse<MIAUser>>(this._baseUrlInternal + 'mia-auth/recovery', { email: email});
   }
 
