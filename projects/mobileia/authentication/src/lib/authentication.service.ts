@@ -136,10 +136,8 @@ export class AuthenticationService {
 
       // Verificar si se logueo correctamente
       if (data.success) {
-        // Guardar AccessToken
-        this.storage.set(this._keyAccessToken, data.response.access_token.access_token).subscribe(() => {});
-        this.storage.set(this._keyUserId, data.response.access_token.user_id).subscribe(() => {});
-        this.storage.set(this._keyUserData, JSON.stringify(data.response.user)).subscribe(() => {});
+        // Guardar info
+        this.saveDataLoginInternal(data.response.access_token.access_token, data.response.access_token.user_id, data.response.user);
         // Guardar que esta logueado
         this.isLoggedIn.next(true);
       }
