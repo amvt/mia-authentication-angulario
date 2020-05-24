@@ -183,6 +183,26 @@ export class AuthenticationService {
     this.fetchProfile().subscribe(data => {});
   }
 
+  fetchProfileInternal(): Observable<ApiResponse<MIAUser>> {
+    return this.getAccessToken().pipe(switchMap(accessToken => {
+      if (accessToken == null) {
+        return;
+      }
+      return this.http.post<ApiResponse<MIAUser>>(this._baseUrlInternal + 'mia-auth/me', { access_token: accessToken});
+    }))
+    .pipe(map(data => {
+
+      // Verificar si se logueo correctamente
+      if (data.success) {
+        this.storage.set(this._keyUserData, JSON.stringify(data.response)).subscribe(() => {});
+        // Sincronizar dato del usuario
+        this.currentUser.next(data.response);
+      }
+
+      return data;
+    }));
+  }
+
   fetchProfile(): Observable<ApiResponse<MIAUser>> {
     // Obtenemos AccessToken
     return this.getAccessToken().pipe(switchMap(accessToken => {
