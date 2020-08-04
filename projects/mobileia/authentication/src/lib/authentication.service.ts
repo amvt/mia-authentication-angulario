@@ -74,24 +74,17 @@ export class AuthenticationService {
     });
   }
 
-  signInWithGoogle(authToken: string, googleToken: string): Observable<ApiResponse<MIAAccessToken>> {
+  signInWithGoogle(token: string): Observable<ApiResponse<{ access_token: MIAAccessToken, user: MIAUser }>> {
     const params = {
-      grant_type: 'google',
-      app_id: this._apiKey,
-      auth_token: authToken,
-      google_token: googleToken
+      token: token
     };
-    return this.http.post<ApiResponse<MIAAccessToken>>(this._baseUrl + 'oauth', params)
+    return this.http.post<ApiResponse<{ access_token: MIAAccessToken, user: MIAUser }>>(this._baseUrlInternal + 'mia-auth/google-signin', params)
     .pipe(map(data => {
 
       // Verificar si se logueo correctamente
       if (data.success) {
-        // Guardar AccessToken
-        this.storage.set(this._keyAccessToken, data.response.access_token).subscribe(() => {
-          // Buscar datos del perfil
-          this.loadProfile();
-        });
-        this.storage.set(this._keyUserId, data.response.user_id).subscribe(() => {});
+        // Guardar info
+        this.saveDataLoginInternal(data.response.access_token.access_token, data.response.access_token.user_id, data.response.user);
         // Guardar que esta logueado
         this.isLoggedIn.next(true);
       }
@@ -100,24 +93,17 @@ export class AuthenticationService {
     }));
   }
 
-  signInWithFacebook(facebookId: string, facebookToken: string): Observable<ApiResponse<MIAAccessToken>> {
+  signInWithFacebook(token: string): Observable<ApiResponse<{ access_token: MIAAccessToken, user: MIAUser }>> {
     const params = {
-      grant_type: 'facebook',
-      app_id: this._apiKey,
-      facebook_id: facebookId,
-      facebook_access_token: facebookToken
+      token: token
     };
-    return this.http.post<ApiResponse<MIAAccessToken>>(this._baseUrl + 'oauth', params)
+    return this.http.post<ApiResponse<{ access_token: MIAAccessToken, user: MIAUser }>>(this._baseUrlInternal + 'mia-auth/facebook-signin', params)
     .pipe(map(data => {
 
       // Verificar si se logueo correctamente
       if (data.success) {
-        // Guardar AccessToken
-        this.storage.set(this._keyAccessToken, data.response.access_token).subscribe(() => {
-          // Buscar datos del perfil
-          this.loadProfile();
-        });
-        this.storage.set(this._keyUserId, data.response.user_id).subscribe(() => {});
+        // Guardar info
+        this.saveDataLoginInternal(data.response.access_token.access_token, data.response.access_token.user_id, data.response.user);
         // Guardar que esta logueado
         this.isLoggedIn.next(true);
       }
