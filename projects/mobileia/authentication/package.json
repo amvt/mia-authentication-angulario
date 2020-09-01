@@ -1,6 +1,6 @@
 {
     "name": "@mobileia/authentication",
-    "version": "9.0.13",
+    "version": "9.0.14",
     "peerDependencies": {
         "@angular/common": "^9.0.5",
         "@angular/core": "^9.0.5",

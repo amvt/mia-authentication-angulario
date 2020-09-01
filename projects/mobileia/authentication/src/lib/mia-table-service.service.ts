@@ -31,7 +31,7 @@ export class MiaTableService<T> extends MiaAuthHttpService {
   }
 
   fetchListWithExtra(params: MIATableModel, paramsTwo: any): Promise<ApiPagination<T>> {
-    let data = {...params, ...paramsTwo};
+    let data = {...params.toParams(), ...paramsTwo};
     return this.postAuthObjectPro(this.basePathUrl + '/list', data);
   }
 
