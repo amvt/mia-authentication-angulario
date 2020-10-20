@@ -9,4 +9,6 @@ export class MIAUser {
     public role: number;
     public created_at: string;
     public is_online: number;
+    public document: string;
+    public external_code: string;
 }
